@@ -1,24 +1,77 @@
---- Sample API v2 ---
+FORMAT: 1A
+HOST: http://www.google.com
 
--- Shopping Cart Resources --
-GET /shopping-cart
-< 200
-{ "items": [
- "url": "/shopping-cart/1" "product":"2ZY48XPZ", "quantity": 1, "name": "New socks", "price": 1.25 }
-] }
+# Name
 
+## Schema [/schema]
 
-Comment block for this resource (support [Markdown](http://daringfireball.net/projects/markdown/syntax) format syntax)
-POST /shopping-cart
-> Content-Type: application/json
-{ "product":"1AB23ORM", "quantity": 2 }
-< 201
-< Content-Type: application/json
-{ "status": "created", "url": "/shopping-cart/2" }
+### Update a Shipment [PUT]
+Modify an existing shipment.
 
--- Payment Resources --
-This resource allows you to submit payment information to process your *shopping cart* items
-POST /payment
-{ cc: "12345678900", cvc: "123", expiry: "0112" }
-< 200
-{ receipt: "/payment/receipt/1" }
++ Request (application/json)
+    
+    + Headers
+        
+            Authorization: Token 3e47b75000b0924b6c9ba5759a7cf15d
+
+    + Body
+    
+            {
+                "status": "IN_TRANSIT_TO_ORIGIN"
+            }
+            
+    + Schema
+
+            {
+                "title": "Shipment",
+                "description": "A Badger shipment resource",
+                "type": "object"
+                "properties": {
+                    "status": {
+                        "description": "Status code of current shipment status",
+                        "type": "string",
+                        "enum": [
+                            "IN_TRANSIT_TO_ORIGIN",
+                            "AT_ORIGIN",
+                            "IN_TRANSIT_TO_DESTINATION",
+                            "DELAYED",
+                            "COMPLETED"
+                        ],
+                        "required": true
+                    }
+                }
+            }
+                
+
++ Response 401 (application/json)
+
+    + Body 
+            
+            { 
+                "error": {
+                    "code": 1001,
+                    "message": "Authorization required"
+                }
+            }
+    
++ Response 403 (application/json)
+
+    + Body 
+            
+            { 
+                "error": {
+                    "code": 1004,
+                    "message": "Access denied"
+                }
+            }
+    
++ Response 404 (application/json)
+
+    + Body 
+            
+            { 
+                "error": {
+                    "code": 1005,
+                    "message": "Shipment not found"
+                }
+            }
